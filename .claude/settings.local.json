@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun install)",
+      "Bash(curl -fsSL https://bun.sh/install)",
+      "Bash(bash)",
+      "Bash(exec /bin/zsh)",
+      "Bash(export PATH=\"$HOME/.bun/bin:$PATH\")",
+      "Bash(bun db:push)",
+      "Bash(bun run db:push)",
+      "Bash(ping -c 3 aws-1-ap-southeast-1.pooler.supabase.com)",
+      "Bash(timeout 60 bun run db:push)",
+      "Bash(bun run dev)",
+      "Bash(bun run dev:web)",
+      "Bash(openssl rand -base64 32)",
+      "Bash(bun add pg @types/pg)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

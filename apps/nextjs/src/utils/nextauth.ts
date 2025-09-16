@@ -98,7 +98,7 @@ const authMiddleware = withAuth(
  * @param request
  * @returns
  */
-export default async function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   if (isNoNeedProcess(request)) {
     return null;
   }
