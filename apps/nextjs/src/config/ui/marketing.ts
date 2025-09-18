@@ -9,28 +9,33 @@ export const getMarketingConfig = async ({
     lang: Locale;
   };
 }): Promise<MarketingConfig> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const dict = await getDictionary(lang);
   return {
     mainNav: [
       {
-        title: "Libra AI",
-        href: "https://libra.dev/",
+        title: "Home",
+        href: "/",
       },
       {
-        title: dict.marketing.main_nav_features,
-        href: `/#features`,
+        title: "Inspiration",
+        href: "/inspiration",
       },
       {
-        title: dict.marketing.main_nav_pricing,
-        href: `/pricing`,
+        title: "Tutorials",
+        href: "/tutorials",
       },
       {
-        title: dict.marketing.main_nav_blog,
-        href: `/blog`,
+        title: "Tools",
+        href: "/tools",
       },
       {
-        title: dict.marketing.main_nav_documentation,
-        href: `/docs`,
+        title: "Image to Prompt",
+        href: "/image-to-prompt",
+      },
+      {
+        title: "Pricing",
+        href: "/pricing",
       },
     ],
   };

@@ -30,12 +30,13 @@ export function MainNav({ items, children, params: { lang }, marketing }: MainNa
     <div className="flex gap-6 md:gap-10">
       <div className="flex items-center">
         <Link href={`/${lang}`} className="hidden items-center space-x-2 md:flex">
-          <div className="text-3xl">Saasfly</div>
+          <Icons.Image className="h-8 w-8 text-purple-600" />
+          <div className="text-2xl font-bold text-gray-900">ImagePrompt.org</div>
         </Link>
 
         <Link href="https://docs.saasfly.io" target="_blank" className="ml-4 hidden md:flex lg:flex xl:flex">
           <DocumentGuide>
-            {typeof marketing?.introducing === "string" ? marketing?.introducing : "Introducing Saasfly"}
+            {typeof marketing?.introducing === "string" ? marketing?.introducing : "Introducing ImagePrompt"}
           </DocumentGuide>
         </Link>
       </div>
@@ -44,8 +45,8 @@ export function MainNav({ items, children, params: { lang }, marketing }: MainNa
         className="flex items-center space-x-2 md:hidden"
         onClick={() => setShowMobileMenu(!showMobileMenu)}
       >
-        {showMobileMenu ? <Icons.Close/> : <Icons.Logo/>}
-        <span className="font-bold">Menu</span>
+        {showMobileMenu ? <Icons.Close/> : <Icons.Image/>}
+        <span className="font-bold">ImagePrompt</span>
       </button>
       {showMobileMenu && items && (
         <MobileNav items={items} menuItemClick={handleMenuItemClick}>
