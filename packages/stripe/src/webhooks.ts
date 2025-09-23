@@ -6,6 +6,10 @@ import { stripe } from ".";
 import { getSubscriptionPlan } from "./plans";
 
 export async function handleEvent(event: Stripe.DiscriminatedEvent) {
+  if (!stripe) {
+    throw new Error("Stripe not configured");
+  }
+  
   const session = event.data.object as Stripe.Checkout.Session;
   if (event.type === "checkout.session.completed") {
     const subscription = await stripe.subscriptions.retrieve(

@@ -40,12 +40,15 @@ export const authOptions: NextAuthOptions = {
   adapter: KyselyAdapter(db),
 
   providers: [
-    GitHubProvider({
-      clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
-      httpOptions: { timeout: 15000 },
-    }),
-    EmailProvider({
+    ...(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET ? [
+      GitHubProvider({
+        clientId: env.GITHUB_CLIENT_ID,
+        clientSecret: env.GITHUB_CLIENT_SECRET,
+        httpOptions: { timeout: 15000 },
+      })
+    ] : []),
+    ...(env.RESEND_API_KEY ? [
+      EmailProvider({
       sendVerificationRequest: async ({ identifier, url }) => {
         const user = await db
           .selectFrom("User")
@@ -78,7 +81,8 @@ export const authOptions: NextAuthOptions = {
           console.log(error);
         }
       },
-    }),
+    })
+    ] : []),
   ],
   callbacks: {
     session({ token, session }) {
