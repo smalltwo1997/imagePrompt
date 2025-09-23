@@ -2,8 +2,8 @@
   "github": {
     "silent": true
   },
-  "buildCommand": "bun run build",
-  "outputDirectory": ".next",
+  "buildCommand": "bun turbo build --filter=@saasfly/nextjs",
+  "outputDirectory": "apps/nextjs/.next",
   "installCommand": "bun install",
   "framework": "nextjs"
 }
