@@ -6,6 +6,8 @@ export async function POST(request: NextRequest) {
     // 检查请求是否包含文件
     const formData = await request.formData();
     const file = formData.get("image") as File;
+    const promptType = formData.get("promptType") as string || "general";
+    const userQuery = formData.get("userQuery") as string;
 
     if (!file) {
       return NextResponse.json(
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 调用扣子API生成提示词
-    const prompt = await cozeApiClient.imageToPrompt(file);
+    const prompt = await cozeApiClient.imageToPrompt(file, promptType, userQuery);
 
     return NextResponse.json({
       success: true,

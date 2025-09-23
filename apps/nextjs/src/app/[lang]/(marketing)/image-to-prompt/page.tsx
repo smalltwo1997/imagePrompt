@@ -105,6 +105,7 @@ export default function ImageToPromptPage() {
     try {
       const formData = new FormData();
       formData.append("image", uploadedFile);
+      formData.append("promptType", selectedModel);
 
       const response = await fetch("/api/image-to-prompt", {
         method: "POST",

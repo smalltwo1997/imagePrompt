@@ -97,109 +97,48 @@ class CozeApiClient {
    * 运行工作流生成图片提示词
    * 官方文档: https://www.coze.cn/open/docs/developer_guides/workflow_run
    */
-  async runWorkflow(fileId: string): Promise<CozeWorkflowResponse> {
+  async runWorkflow(fileId: string, promptType: string = "general", userQuery?: string): Promise<CozeWorkflowResponse> {
     try {
       console.log("开始运行工作流:", {
         workflowId: this.workflowId,
         fileId: fileId,
       });
 
-      // 根据用户提供的扣子工作流参数配置
-      const parameterFormats = [
-        // 格式1: 匹配扣子工作流的确切参数（img: Image, promptType: String, userQuery: String 可选）
-        {
-          workflow_id: this.workflowId,
-          parameters: {
-            img: fileId,
-            promptType: "general",
-            userQuery: "Generate a detailed prompt for this image"
-          }
+      // 构建请求参数
+      const params = {
+           img: {file_id:fileId},
+           promptType: promptType,
+           userQuery: userQuery || ""
+         };
+       const requestBody = {
+         workflow_id: this.workflowId,
+         parameters: params
+       };
+
+      console.log("运行工作流参数:", JSON.stringify(requestBody, null, 2));
+
+      // 调用工作流API
+      const response = await fetch(`${COZE_API_BASE_URL}/v1/workflow/run`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${this.apiToken}`,
+          "Content-Type": "application/json",
         },
-        // 格式2: 只包含必填参数（img 和 promptType）
-        {
-          workflow_id: this.workflowId,
-          parameters: {
-            img: fileId,
-            promptType: "general"
-          }
-        },
-        // 格式3: 使用不同的 promptType 值
-        {
-          workflow_id: this.workflowId,
-          parameters: {
-            img: fileId,
-            promptType: "detailed",
-            userQuery: "Generate a detailed prompt for this image"
-          }
-        },
-        // 格式4: 使用 midjourney 类型
-        {
-          workflow_id: this.workflowId,
-          parameters: {
-            img: fileId,
-            promptType: "midjourney",
-            userQuery: "Generate a Midjourney-style prompt for this image"
-          }
-        },
-        // 格式5: 使用 flux 类型
-        {
-          workflow_id: this.workflowId,
-          parameters: {
-            img: fileId,
-            promptType: "flux",
-            userQuery: "Generate a Flux-optimized prompt for this image"
-          }
-        },
-        // 格式6: 空的 userQuery（因为它是可选的）
-        {
-          workflow_id: this.workflowId,
-          parameters: {
-            img: fileId,
-            promptType: "general",
-            userQuery: ""
-          }
-        }
-      ];
+        body: JSON.stringify(requestBody),
+      });
 
-      for (let i = 0; i < parameterFormats.length; i++) {
-        const requestBody = parameterFormats[i];
+      console.log("工作流响应状态:", response.status, response.statusText);
 
-        try {
-          console.log(`尝试工作流格式 ${i + 1}:`, JSON.stringify(requestBody, null, 2));
-
-          const response = await fetch(`${COZE_API_BASE_URL}/v1/workflow/run`, {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${this.apiToken}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(requestBody),
-          });
-
-          console.log(`工作流格式 ${i + 1} 响应状态:`, response.status, response.statusText);
-
-          const result: CozeWorkflowResponse = await response.json();
-          console.log(`工作流格式 ${i + 1} 响应结果:`, JSON.stringify(result, null, 2));
-
-          // 检查业务逻辑是否成功
-          if (result.code === 0) {
-            console.log(`工作流格式 ${i + 1} 成功!`);
-            return result;
-          } else {
-            // 如果有debug_url，说明参数已被接受但执行有问题
-            if (result.debug_url) {
-              console.log(`工作流格式 ${i + 1} 参数正确但执行失败，debug_url: ${result.debug_url}`);
-              // 即使失败，也返回结果让调用者处理
-              return result;
-            }
-            console.log(`工作流格式 ${i + 1} 业务逻辑失败:`, result.msg);
-          }
-        } catch (formatError) {
-          console.error(`工作流格式 ${i + 1} 异常:`, formatError);
-        }
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("工作流API错误:", errorText);
+        throw new Error(`工作流API错误: ${response.status} ${errorText}`);
       }
 
-      throw new Error("所有工作流参数格式都失败了");
+      const result: CozeWorkflowResponse = await response.json();
+      console.log("工作流响应结果:", JSON.stringify(result, null, 2));
+
+      return result;
     } catch (error) {
       console.error("工作流运行失败:", error);
       throw error;
@@ -236,7 +175,7 @@ class CozeApiClient {
   /**
    * 完整的图片转提示词流程
    */
-  async imageToPrompt(file: File): Promise<string> {
+  async imageToPrompt(file: File, promptType: string = "general", userQuery?: string): Promise<string> {
     try {
       // 1. 上传文件
       const uploadResult = await this.uploadFile(file);
@@ -248,40 +187,58 @@ class CozeApiClient {
 
       // 2. 使用工作流API生成提示词
       console.log("使用工作流API生成提示词");
-      const workflowResult = await this.runWorkflow(uploadResult.data.id);
+      const workflowResult = await this.runWorkflow(uploadResult.data.id, promptType, userQuery);
 
-      // 检查工作流是否成功启动
-      if (workflowResult.code === 0 && workflowResult.data?.execute_id) {
-        // 3. 轮询查询结果
-        const executeId = workflowResult.data.execute_id;
-        let attempts = 0;
-        const maxAttempts = 30; // 最多等待30次，每次2秒
-
-        while (attempts < maxAttempts) {
-          await new Promise(resolve => setTimeout(resolve, 2000)); // 等待2秒
-
-          const statusResult = await this.getWorkflowStatus(executeId);
-          if (statusResult.code !== 0) {
-            throw new Error(statusResult.msg || "查询状态失败");
-          }
-
-          const status = statusResult.data?.status;
-          if (status === "success") {
-            const output = statusResult.data?.result?.output;
-            if (output) {
-              return output;
+      // 检查工作流是否成功执行
+      if (workflowResult.code === 0) {
+        // 直接从data字段解析结果
+        if (workflowResult.data && typeof workflowResult.data === 'string') {
+          try {
+            const parsedData = JSON.parse(workflowResult.data);
+            if (parsedData.output) {
+              console.log("成功获取提示词:", parsedData.output);
+              return parsedData.output;
             } else {
-              throw new Error("工作流执行成功但未返回结果");
+              throw new Error("工作流执行成功但未返回output字段");
             }
-          } else if (status === "failed") {
-            throw new Error("工作流执行失败");
+          } catch (parseError) {
+            console.error("解析工作流返回数据失败:", parseError);
+            throw new Error("解析工作流返回数据失败");
           }
-          // status === "running" 继续等待
+        } else if (workflowResult.data?.execute_id) {
+          // 如果返回execute_id，则需要轮询查询结果
+          const executeId = workflowResult.data.execute_id;
+          let attempts = 0;
+          const maxAttempts = 30; // 最多等待30次，每次2秒
 
-          attempts++;
+          while (attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 2000)); // 等待2秒
+
+            const statusResult = await this.getWorkflowStatus(executeId);
+            if (statusResult.code !== 0) {
+              throw new Error(statusResult.msg || "查询状态失败");
+            }
+
+            const status = statusResult.data?.status;
+            if (status === "success") {
+              const output = statusResult.data?.result?.output;
+              if (output) {
+                return output;
+              } else {
+                throw new Error("工作流执行成功但未返回结果");
+              }
+            } else if (status === "failed") {
+              throw new Error("工作流执行失败");
+            }
+            // status === "running" 继续等待
+
+            attempts++;
+          }
+
+          throw new Error("工作流执行超时，请稍后重试");
+        } else {
+          throw new Error("工作流返回数据格式异常");
         }
-
-        throw new Error("工作流执行超时，请稍后重试");
       }
       // 如果有debug_url，说明参数已被接受但可能有配置问题
       else if (workflowResult.debug_url) {
