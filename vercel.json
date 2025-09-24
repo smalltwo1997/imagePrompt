@@ -2,12 +2,13 @@
   "github": {
     "silent": true
   },
-  "buildCommand": "bun install && bun run build",
-  "outputDirectory": "apps/nextjs/.next",
-  "installCommand": "bun install",
+  "buildCommand": "cd ../.. && bun install && bun run build",
+  "outputDirectory": ".next",
+  "installCommand": "cd ../.. && bun install",
+  "rootDirectory": "apps/nextjs",
   "framework": null,
   "functions": {
-    "apps/nextjs/src/app/api/**": {
+    "src/app/api/**": {
       "maxDuration": 30
     }
   }
