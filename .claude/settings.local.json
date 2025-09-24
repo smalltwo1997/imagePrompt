@@ -33,7 +33,16 @@
       "Bash(curl -X POST http://localhost:3000/api/image-to-prompt -F \"image=@/Users/smalltwo/Desktop/11.jpeg\" --connect-timeout 25)",
       "Bash(curl -X POST http://localhost:3000/api/image-to-prompt -F \"image=@/Users/smalltwo/Desktop/11.jpeg\" --connect-timeout 30)",
       "Bash(curl -X POST http://localhost:3000/api/image-to-prompt -F \"image=@/Users/smalltwo/Desktop/11.jpeg\" --connect-timeout 45)",
-      "Bash(curl -X POST http://localhost:3000/api/image-to-prompt -F \"image=@/Users/smalltwo/Desktop/11.jpeg\" --connect-timeout 60)"
+      "Bash(curl -X POST http://localhost:3000/api/image-to-prompt -F \"image=@/Users/smalltwo/Desktop/11.jpeg\" --connect-timeout 60)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(pkill -f \"next-server\")",
+      "Bash(echo $?)",
+      "Bash(bun --version)",
+      "Bash(node --version)",
+      "Bash(bun install --dry-run)",
+      "Bash(bun install --fix)",
+      "Bash(find . -name \"vercel.json\" -exec cat {} ;)",
+      "Bash(cat turbo.json)"
     ],
     "deny": [],
     "ask": []
