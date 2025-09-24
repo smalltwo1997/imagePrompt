@@ -1,4 +1,4 @@
-import { Inter as FontSans } from "next/font/google";
+// import { Inter as FontSans } from "next/font/google";
 import localFont from "next/font/local";
 
 import "~/styles/globals.css";
@@ -19,10 +19,10 @@ import { siteConfig } from "~/config/site";
 // import { Suspense } from "react";
 // import { PostHogPageview } from "~/config/providers";
 
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
+// const fontSans = FontSans({
+//   subsets: ["latin"],
+//   variable: "--font-sans",
+// });
 
 // Font files can be colocated inside of `pages`
 const fontHeading = localFont({
@@ -86,7 +86,7 @@ export default function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable,
+          // fontSans.variable,
           fontHeading.variable,
         )}
       >
