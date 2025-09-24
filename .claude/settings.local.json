@@ -42,7 +42,8 @@
       "Bash(bun install --dry-run)",
       "Bash(bun install --fix)",
       "Bash(find . -name \"vercel.json\" -exec cat {} ;)",
-      "Bash(cat turbo.json)"
+      "Bash(cat turbo.json)",
+      "Bash(cat package.json)"
     ],
     "deny": [],
     "ask": []
