@@ -43,7 +43,9 @@
       "Bash(bun install --fix)",
       "Bash(find . -name \"vercel.json\" -exec cat {} ;)",
       "Bash(cat turbo.json)",
-      "Bash(cat package.json)"
+      "Bash(cat package.json)",
+      "Bash(xargs ls -la)",
+      "Bash(find apps/nextjs/.next -name \"routes-manifest.json\" -exec ls -la {} ;)"
     ],
     "deny": [],
     "ask": []
