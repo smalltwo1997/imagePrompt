@@ -1,0 +1,14 @@
+{
+  "github": {
+    "silent": true
+  },
+  "buildCommand": "cd ../.. && bun install && cd apps/nextjs && bun run build",
+  "outputDirectory": ".next",
+  "installCommand": "cd ../.. && bun install",
+  "framework": null,
+  "functions": {
+    "src/app/api/**": {
+      "maxDuration": 30
+    }
+  }
+}
