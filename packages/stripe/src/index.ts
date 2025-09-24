@@ -8,9 +8,9 @@ export * from "./webhooks";
 
 export type { Stripe };
 
-export const stripe = env.STRIPE_API_KEY ? new Stripe(env.STRIPE_API_KEY, {
+export const stripe = new Stripe(env.STRIPE_API_KEY, {
   typescript: true,
-}) : null;
+});
 
 /**
  * Stripe typing is hot garbage. This makes it slightly less so.

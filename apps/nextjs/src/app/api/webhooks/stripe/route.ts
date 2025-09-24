@@ -5,11 +5,6 @@ import { handleEvent, stripe, type Stripe } from "@saasfly/stripe";
 import { env } from "~/env.mjs";
 
 const handler = async (req: NextRequest) => {
-  if (!env.STRIPE_WEBHOOK_SECRET || !stripe) {
-    console.log("❌ Stripe not configured");
-    return NextResponse.json({ error: "Webhook not configured" }, { status: 400 });
-  }
-
   const payload = await req.text();
   const signature = req.headers.get("Stripe-Signature")!;
   try {

@@ -39,8 +39,6 @@ export default function ImageToPromptPage() {
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [userQuery, setUserQuery] = useState("");
-  const [copySuccess, setCopySuccess] = useState(false);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -97,16 +95,6 @@ export default function ImageToPromptPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleCopyPrompt = async () => {
-    try {
-      await navigator.clipboard.writeText(generatedPrompt);
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
-    }
-  };
-
   const handleGeneratePrompt = async () => {
     if (!uploadedFile) return;
 
@@ -118,9 +106,6 @@ export default function ImageToPromptPage() {
       const formData = new FormData();
       formData.append("image", uploadedFile);
       formData.append("promptType", selectedModel);
-      if (userQuery.trim()) {
-        formData.append("userQuery", userQuery.trim());
-      }
 
       const response = await fetch("/api/image-to-prompt", {
         method: "POST",
@@ -289,24 +274,6 @@ export default function ImageToPromptPage() {
               </select>
             </div>
 
-            {/* User Query Input */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <label htmlFor="user-query" className="block text-sm font-medium text-gray-900 mb-2">
-                Additional Requirements (Optional)
-              </label>
-              <textarea
-                id="user-query"
-                value={userQuery}
-                onChange={(e) => setUserQuery(e.target.value)}
-                placeholder="Describe specific details you want in the prompt, such as style, mood, composition, or any particular elements..."
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                rows={3}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Example: "Focus on the lighting and shadows", "Describe in artistic style", "Include technical camera details"
-              </p>
-            </div>
-
             {/* Generate Button */}
             <div className="space-y-4">
               {error && (
@@ -367,20 +334,11 @@ export default function ImageToPromptPage() {
                     <p className="text-gray-800">{generatedPrompt}</p>
                     <div className="flex gap-2">
                       <Button
-                        onClick={handleCopyPrompt}
+                        onClick={() => navigator.clipboard.writeText(generatedPrompt)}
                         className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm"
                       >
-                        {copySuccess ? (
-                          <>
-                            <Check className="w-4 h-4 mr-2" />
-                            Copied!
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-4 h-4 mr-2" />
-                            Copy
-                          </>
-                        )}
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy
                       </Button>
                     </div>
                   </div>
